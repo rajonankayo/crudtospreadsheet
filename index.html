@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>Login Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -17,71 +22,115 @@
 
     .login-box {
       background: white;
-      padding: 40px;
+      padding: 40px 30px;
       border-radius: 10px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      box-shadow: 0 0 30px rgba(0,0,0,0.15);
       text-align: center;
-      width: 300px;
+      width: 100%;
+      max-width: 350px;
     }
 
     .login-box h2 {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      color: #2980b9;
     }
 
     .login-box input[type="password"] {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-bottom: 2px solid #2980b9;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
       outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .login-box input[type="password"]:focus {
+      border-color: #2980b9;
     }
 
     .login-box button {
       background-color: #2980b9;
       color: white;
-      padding: 10px;
+      padding: 12px;
       width: 100%;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
     }
 
-    .login-box .message {
+    .login-box button:disabled {
+      background-color: #95cbee;
+      cursor: not-allowed;
+    }
+
+    .message {
       margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .message.success {
+      color: green;
+    }
+
+    .message.error {
       color: red;
     }
   </style>
 </head>
 <body>
+
   <div class="login-box">
     <h2>Login</h2>
     <input type="password" id="password" placeholder="Enter password">
-    <button onclick="login()">Login</button>
-    <div class="message" id="message"></div>
+    <button id="loginBtn" onclick="login()">Login</button>
+    <div id="message" class="message"></div>
   </div>
 
   <script>
     async function login() {
-      const enteredPassword = document.getElementById('password').value;
+      const enteredPassword = document.getElementById('password').value.trim();
       const messageDiv = document.getElementById('message');
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyxMMZliM5xej-otqEexDWWXjQzq5l7g9g9n1t5pyQ4w14rBO33NpwEdR--IlIN-kRM/exec'; // ganti dengan URL Web App
+      const loginBtn = document.getElementById('loginBtn');
+
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyxMMZliM5xej-otqEexDWWXjQzq5l7g9g9n1t5pyQ4w14rBO33NpwEdR--IlIN-kRM/exec';
+
+      // Reset message
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Checking...';
 
       try {
         const response = await fetch(scriptURL);
+        if (!response.ok) throw new Error("Response not OK");
+        
         const correctPassword = await response.text();
 
         if (enteredPassword === correctPassword) {
-          messageDiv.style.color = 'green';
           messageDiv.textContent = 'Login successful!';
-          // Redirect or perform action here
+          messageDiv.classList.add('success');
+
+          // Simulasi redirect (gunakan redirect asli jika perlu)
+          setTimeout(() => {
+            window.location.href = "https://google.com"; // Ganti URL tujuan
+          }, 1000);
         } else {
           messageDiv.textContent = 'Incorrect password.';
+          messageDiv.classList.add('error');
         }
       } catch (error) {
-        messageDiv.textContent = 'Error connecting to server.';
+        messageDiv.textContent = 'Failed to connect to server.';
+        messageDiv.classList.add('error');
+        console.error(error);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
       }
     }
   </script>
+
 </body>
 </html>
